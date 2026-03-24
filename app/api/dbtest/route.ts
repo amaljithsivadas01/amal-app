@@ -1,12 +1,9 @@
-import { supabase } from "@/app/lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 export async function GET() {
   const { data, error } = await supabase
-    .from("test")
+    .from("goals")
     .select("*");
 
-  return Response.json({
-    data,
-    error,
-  });
+  return Response.json({ data, error });
 }

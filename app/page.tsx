@@ -9,11 +9,41 @@ export default function Home() {
     progress: 0,
   });
 
-  useEffect(() => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = () => {
     fetch("/api/dashboard")
       .then((res) => res.json())
       .then((d) => setData(d));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const createGoal = async () => {
+    if (!title) return;
+
+    setLoading(true);
+
+    await fetch("/api/goals", {
+      method: "POST",
+      body: JSON.stringify({
+        title,
+        description: desc,
+      }),
+    });
+
+    setLoading(false);
+    setOpen(false);
+    setTitle("");
+    setDesc("");
+
+    fetchData();
+  };
 
   return (
     <div className="space-y-6">
@@ -26,7 +56,10 @@ export default function Home() {
           <p className="text-zinc-500">Your daily overview</p>
         </div>
 
-        <button className="bg-black text-white px-4 py-2 rounded-xl w-full md:w-auto">
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-black text-white px-4 py-2 rounded-xl w-full md:w-auto"
+        >
           + New Goal
         </button>
 
@@ -35,52 +68,82 @@ export default function Home() {
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
 
-        {/* Goals */}
         <div className="bg-zinc-50 rounded-2xl p-4 md:p-5 shadow-sm">
           <p className="text-sm text-zinc-500">Goals</p>
-          <h3 className="text-3xl font-semibold mt-2">
-            {data.goals}
-          </h3>
+          <h3 className="text-3xl font-semibold mt-2">{data.goals}</h3>
         </div>
 
-        {/* Tasks */}
         <div className="bg-zinc-50 rounded-2xl p-4 md:p-5 shadow-sm">
           <p className="text-sm text-zinc-500">Tasks Today</p>
-          <h3 className="text-3xl font-semibold mt-2">
-            {data.tasks}
-          </h3>
+          <h3 className="text-3xl font-semibold mt-2">{data.tasks}</h3>
         </div>
 
-        {/* Progress */}
         <div className="bg-zinc-50 rounded-2xl p-4 md:p-5 shadow-sm">
           <p className="text-sm text-zinc-500">Progress</p>
-          <h3 className="text-3xl font-semibold mt-2">
-            {data.progress}%
-          </h3>
+          <h3 className="text-3xl font-semibold mt-2">{data.progress}%</h3>
         </div>
 
       </div>
 
-      {/* Bottom Section */}
+      {/* Bottom */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
-        {/* Activity */}
         <div className="bg-zinc-50 rounded-2xl p-4 md:p-6 shadow-sm">
           <h3 className="font-semibold mb-4">Recent Activity</h3>
-          <p className="text-zinc-500 text-sm">
-            Coming soon...
-          </p>
+          <p className="text-zinc-500 text-sm">Coming soon...</p>
         </div>
 
-        {/* Today */}
         <div className="bg-zinc-50 rounded-2xl p-4 md:p-6 shadow-sm">
           <h3 className="font-semibold mb-4">Today</h3>
-          <p className="text-zinc-500 text-sm">
-            Coming soon...
-          </p>
+          <p className="text-zinc-500 text-sm">Coming soon...</p>
         </div>
 
       </div>
+
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur flex items-center justify-center p-4">
+
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md space-y-4">
+
+            <h3 className="text-lg font-semibold">New Goal</h3>
+
+            <input
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 outline-none"
+            />
+
+            <textarea
+              placeholder="Description"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 outline-none"
+            />
+
+            <div className="flex gap-2 pt-2">
+
+              <button
+                onClick={() => setOpen(false)}
+                className="flex-1 border rounded-lg py-2"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={createGoal}
+                className="flex-1 bg-black text-white rounded-lg py-2"
+              >
+                {loading ? "Creating..." : "Create"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );

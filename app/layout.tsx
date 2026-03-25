@@ -40,9 +40,12 @@ export default function RootLayout({
                   Calendar
                 </div>
 
-                <div className="px-3 py-2 rounded-xl hover:bg-zinc-100 cursor-pointer">
-                  Goals
-                </div>
+                <a
+  href="/goals"
+  className="block px-3 py-2 rounded-xl hover:bg-zinc-100"
+>
+  Goals
+</a>
 
                 <div className="px-3 py-2 rounded-xl hover:bg-zinc-100 cursor-pointer">
                   Progress
